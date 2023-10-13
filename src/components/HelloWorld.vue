@@ -1,37 +1,40 @@
 <template>
-  <div class="component-container">
-    <div class="top-nav"> <Navbar /></div>
-    <t-row :gutter="[12, 12]" >
-      <t-col :xs="6" :xl="4"> <!-- xs 768p以下的长度 xl 1440p以上长度-->
+    <dv-full-screen-container>
+      <div style="display: flex; flex-direction: row; align-items: center;">
+        <dv-decoration-8 style="height: 50px; flex: 1;" />
+        <div style="display: flex; flex-direction: column;">
+          <dv-decoration-7 style="flex: 1;font-size: 25px;color: white">智 能 照 明 管 理 系 统</dv-decoration-7>
+          <dv-decoration-5 style="width: 300px; height: 40px;" />
+        </div>
+        <dv-decoration-8 :reverse="true" style="height: 50px; flex: 1;" />
+      </div>
+      <dv-border-box-8 style="flex: 0 1 60%;">
+      <t-row :gutter="[12, 12]" >
+      <t-col :xs="6" :xl="3"> <!-- xs 768p以下的长度 xl 1440p以上长度-->
+        <dv-border-box-1>
         <t-card
-          :bordered="true"
-          title="MQTT连接页面"
+          :bordered="false"
           style="height: 400px"
           class="transparent-card"
-          :cover="cover"
         >
-              <t-input-adornment prepend="主机">
-                <t-input clearable v-model="host" placeholder="请输入" @clear="onClear" style="max-width: 500px"/>
-              </t-input-adornment>
-              <br>
-              <t-input-adornment prepend="端口">
-                <t-input clearable v-model="port" placeholder="请输入" @clear="onClear" style="max-width: 500px"/>
-              </t-input-adornment>
-              <br>
-              <t-input-adornment prepend="用户">
-                <t-input clearable v-model="clientId" placeholder="请输入" @clear="onClear" style="max-width: 500px"/>
-              </t-input-adornment>
-              <br>
+          <div class="card-header">MQTT连接界面</div>
+<!--                <t-input label="地址:" clearable v-model="host" placeholder="请输入" @clear="onClear" style="max-width: 500px"/>-->
+<!--              <br>-->
+<!--                <t-input label="端口:" clearable v-model="port" placeholder="请输入" @clear="onClear" style="max-width: 500px"/>-->
+<!--              <br>-->
+<!--                <t-input label="用户:" clearable v-model="clientId" placeholder="请输入" @clear="onClear" style="max-width: 500px"/>-->
+             <br><br><br><br>
               <t-space align="center">
                 <t-button
                   type="success"
                   size="medium"
                   icon=""
+                  shape="round"
                   :disabled="loading || client.connected"
                   :plain="true"
                   @keyup.enter.native="mqttConnect"
                   @click="mqttConnect">
-                  连接
+                  <span>连接</span>
                 </t-button>
                 <t-button
                   class="close-btn"
@@ -39,6 +42,7 @@
                   size="medium"
                   icon=""
                   :plain="true"
+                  shape="round"
                   :loading="loading && client.connected"
                   :disabled="!loading && !client.connected"
                   @keyup.enter.native="disconnectSwitch"
@@ -46,103 +50,118 @@
                   断开
                 </t-button>
               </t-space>
-              <br>
-              <br>
-              <t-space align="center">
-              <t-statistic> 连接状态:
-                <span :style="client.connected ? 'color: #42d885' : ''">{{ getStatus }}</span>
+              <br><br><br><br>
+              <t-statistic> <span style="color:white;">连接状态:</span>
+                <span :style="client.connected ? 'color: #42d885' : 'color: red'">{{ getStatus }}</span>
               </t-statistic>
-              </t-space>
-              <br>
-              <t-input-adornment prepend="主题">
-                <t-input clearable v-model="subTopic" placeholder="请输入" @clear="onClear" style="max-width: 500px"/>
-              </t-input-adornment>
-              <br>
+<!--              <br>-->
+<!--                <t-input label="主题:" clearable v-model="subTopic" placeholder="请输入" @clear="onClear" style="max-width: 500px"/>-->
+<!--              <br>-->
               <t-button
                 type="success"
                 size="medium"
                 :plain="true"
+                shape="round"
                 :disabled="!loading && !client.connected"
                 @keyup.enter.native="handleSubscribeAndStartInterval"
                 @click="handleSubscribeAndStartInterval">
                 接受消息
               </t-button>
         </t-card>
+        </dv-border-box-1>
         <br>
+        <dv-border-box-1>
           <t-card
-            :bordered="true"
-            title="数据展示"
-            style="height: 400px"
+            :bordered="false"
+            style="height: 440px"
             class="transparent-card"
           >
-            <br>
-            <br>
+            <div class="card-header">数据展示</div>
             <t-row :gutter="[12, 12]" >
+          <t-col :xs="12" :xl="12">
+          <t-card
+                 class="transparent-card"
+                :bordered="false">
+              <icon name="device" size="30px" class="icon-color"/><span class="light">设备数量：{{ deviceCount }}</span>
+          </t-card>
+            <br>
+          </t-col>
             <t-col :xs="12" :xl="6">
             <t-card
+              class="transparent-card"
               :bordered="false">
-              <icon name="celsius" size="30px"/><span class="light">工作温度:{{ getLatestValueByTopic('temp_hum/emqx', 'temp') }}°C</span>
+              <icon name="celsius" size="30px" class="icon-color"/><span class="light">温度:{{ getLatestValueByTopic('temp_hum/emqx', 'temp') }}°C</span>
             </t-card>
               <br>
               <br>
               <t-card
+                class="transparent-card"
                 :bordered="false">
-                <icon name="sunny" size="30px"/><span class="light">工作光强:{{ getLatestValueByTopic('temp_hum/emqx', 'light') }}Lx</span>
+                <icon name="sunny" size="30px" class="icon-color"/><span class="light">光强:{{ getLatestValueByTopic('temp_hum/emqx', 'light') }}Lx</span>
               </t-card>
             </t-col>
             <t-col :xs="12" :xl="6">
             <t-card
+              class="transparent-card"
               :bordered="false">
-            <icon name="rain-medium" size="30px"/><span class="light">工作湿度:{{ getLatestValueByTopic('temp_hum/emqx', 'hum') }}%</span>
+            <icon name="rain-medium" size="30px" class="icon-color"/><span class="light">湿度:{{ getLatestValueByTopic('temp_hum/emqx', 'hum') }}%</span>
           </t-card>
               <br>
               <br>
             <t-card
+              class="transparent-card"
               :bordered="false">
-            <icon name="lightbulb" size="30px"/><span class="light">工作功率:{{ getLatestValueByTopic('temp_hum/emqx', 'power') }}W</span>
+            <icon name="lightbulb" size="30px" class="icon-color"/><span class="light">功率:{{ getLatestValueByTopic('temp_hum/emqx', 'power') }}W</span>
             </t-card>
             </t-col>
             </t-row>
           </t-card>
+        </dv-border-box-1>
       </t-col>
 
-      <t-col :xs="12" :xl="5">
+      <t-col :xs="12" :xl="6">
+        <dv-border-box-1>
         <t-card
-          :bordered="true"
-          title="数据统计"
+          :bordered="false"
           style="height: 400px"
           class="transparent-card"
         >
+          <div class="card-header">数据统计</div>
             <temperature-humidity-chart :temperature-data="temperatureData" :humidity-data="humidityData" :lighting-data="lightingData"/>
         </t-card>
+        </dv-border-box-1>
         <br>
+        <dv-border-box-1>
         <t-card
-          :bordered="true"
-          title="设备位置"
-          style="height: 400px"
+          :bordered="false"
+          style="height: 440px"
           class="transparent-card"
         >
+          <div class="card-header">设备位置</div>
           <baidu-map class="bm-view" ak="fnppIqYtsg8hx6ap3KbZn6wuCRQnqFqd"
                      :center="parentCenter">
           </baidu-map>
         </t-card>
+        </dv-border-box-1>
       </t-col>
       <t-col :xs="6" :xl="3">
+        <dv-border-box-1>
         <t-card
-          :bordered="true"
-          title="设备数量"
-          style="height: 259px"
+          :bordered="false"
+          style="height: 270px"
           class="transparent-card"
         >
-          <icon name="device" size="30px"/><span class="light">设备数量：{{ deviceCount }}</span>
+          <div class="card-header">设备数量</div>
         </t-card>
+        </dv-border-box-1>
         <br>
+        <dv-border-box-1>
       <t-card
-        :bordered="true"
-        title="灯光控制"
-        style="height: 260px"
+        :bordered="false"
+        style="height: 270px"
         class="transparent-card"
       >
+        <div class="card-header">灯光控制</div>
         <br>
         <br>
         <t-slider
@@ -151,13 +170,15 @@
           @change="handleSliderInput"
         />
       </t-card>
+        </dv-border-box-1>
         <br>
+        <dv-border-box-1>
         <t-card
-        :bordered="true"
-        style="height: 260px"
-        title="设备报警"
+        :bordered="false"
+        style="height: 278px"
         class="transparent-card"
         >
+          <div class="card-header">设备报警</div>
           <div class="alert-container" style="height: 170px">
             <t-alert theme="error" v-for="(alert, index) in temperatureAlerts" :key="index"  class="alert" >
               {{ alert }}
@@ -167,9 +188,11 @@
             </t-alert>
           </div>
         </t-card>
+        </dv-border-box-1>
       </t-col>
     </t-row>
-  </div>
+      </dv-border-box-8>
+    </dv-full-screen-container>
 </template>
 <script>
 import mqtt from 'mqtt'
@@ -339,7 +362,7 @@ export default {
         const messageContent = JSON.parse(messagesForTopic[0].message)
         return messageContent[key] !== undefined ? messageContent[key] : 'N/A'
       } else {
-        return '暂无消息' // 如果没有匹配到消息，返回 "N/A"
+        return '无消息' // 如果没有匹配到消息，返回 "N/A"
       }
     },
     calculateDeviceCount () {
@@ -723,11 +746,12 @@ export default {
 .humidity ,
 .light{
   font-size: 20px; /* Adjust the font size as needed */
+  color: white;
 }
 .top-nav {
   background-color:white;
   color: #fff;
-  padding: 0gitgit;
+  padding: 0;
   position: fixed;
   top: 0;
   left: 0;
@@ -782,15 +806,33 @@ html, body, ul, li {
 }
  .bm-view {
    width: 100%;
-   height: 300px;
+   height: 350px;
  }
 .transparent-card {
   //border: 3px solid black;
+  background-color: transparent;
 }
 .component-container {
   /* 替换为实际的图像路径 */
   background-size: cover; /* 设置背景图像铺满整个容器 */
   background-repeat: no-repeat; /* 防止图像重复 */
   /* 添加其他样式，例如背景颜色、内边距等 */
+}
+#dv-full-screen-container {
+  background-image: url('./bg.png');
+  background-size: 100% 100%;
+  box-shadow: 0 0 3px blue;
+  display: flex;
+  flex-direction: column;
+}
+.card-header{
+  color: white;
+  height: 50px;
+  text-align: center;
+  line-height: 50px;
+  font-size: 20px;
+}
+.icon-color{
+  color: white;
 }
 </style>

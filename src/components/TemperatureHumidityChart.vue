@@ -1,6 +1,6 @@
 <template>
-  <div class="t-align-center" style="width:100%;height:700px">
-    <chart :option="chartOptions" style="height: 300px;"></chart>
+  <div class="t-align-center" style="width:100%;height:900px">
+    <chart :option="chartOptions" style="height: 350px;"></chart>
   </div>
 
 </template>
@@ -61,15 +61,16 @@ export default {
               }
             },
             axisLabel: {
-              formatter: '{value}°C'
+              formatter: '{value}°C',
+              color: 'white'
             }
           },
           {
             type: 'value',
             name: '光强',
             position: 'right',
-            alignTicks: true,
             offset: 40,
+            alignTicks: true,
             axisLine: {
               show: true,
               lineStyle: {
@@ -103,7 +104,7 @@ export default {
             data: this.temperatureData.map(entry => entry.value), // 温度数据
             yAxisIndex: 0,
             itemStyle: {
-              color: '#BF4C55' // 设置温度系列的颜色为红色
+              color: 'red' // 设置温度系列的颜色为红色
             }
           },
           {
@@ -112,7 +113,7 @@ export default {
             data: this.humidityData.map(entry => entry.value), // 湿度数据
             yAxisIndex: 2,
             itemStyle: {
-              color: '#00BCD0' // 设置湿度系列的颜色为蓝色
+              color: 'green' // 设置湿度系列的颜色为蓝色
             }
           },
           {
@@ -121,7 +122,7 @@ export default {
             data: this.lightingData.map(entry => entry.value), // 光强数据
             yAxisIndex: 1,
             itemStyle: {
-              color: '#574141' // 设置光强系列的颜色为绿色
+              color: 'yellow' // 设置光强系列的颜色为绿色
             }
           }
         ]

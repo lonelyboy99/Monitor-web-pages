@@ -7,10 +7,10 @@ import TDesign from 'tdesign-vue'
 import 'tdesign-vue/es/style/index.css'
 import Vue from 'vue'
 import ECharts from 'vue-echarts'
-
+import dataV from '@jiaminghi/data-view'
 // 引入百度地图API
 import BaiduMap from 'vue-baidu-map'
-
+Vue.use(dataV)
 Vue.use(BaiduMap, {
   ak: 'fnppIqYtsg8hx6ap3KbZn6wuCRQnqFqd' // 替换为你的API密钥
 })
