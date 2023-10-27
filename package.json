@@ -16,6 +16,7 @@
   "dependencies": {
     "@jiaminghi/data-view": "^2.10.0",
     "@vue/composition-api": "^1.7.2",
+    "axios": "^1.5.1",
     "bmap-api": "^1.0.0",
     "echarts": "^5.4.3",
     "element-ui": "^2.15.14",
@@ -26,6 +27,7 @@
     "vue-baidu-map": "^0.21.22",
     "vue-baidu-map-v3": "^1.0.2",
     "vue-echarts": "^6.6.1",
+    "vue-flatpickr": "^2.3.0",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {

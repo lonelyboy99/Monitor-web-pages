@@ -151,7 +151,7 @@
           style="height: 270px"
           class="transparent-card"
         >
-          <div class="card-header">设备数量</div>
+          <Prediction/>
         </t-card>
         </dv-border-box-1>
         <br>
@@ -205,6 +205,7 @@ import BaiduMap from './Map.vue'
 import {Icon} from 'tdesign-icons-vue'
 import Menu from './Menu.vue'
 import moment from 'moment/moment'
+import Prediction from './Prediction.vue'
 
 export default {
   components: {
@@ -212,6 +213,7 @@ export default {
     Navbar,
     Icon,
     Menu,
+    Prediction,
     BaiduMap,
     'chart': ECharts
   },
@@ -230,7 +232,7 @@ export default {
       retryTimes: 0,
       loading: false,
       sending: false,
-      host: '124.220.49.216',
+      host: '122.51.210.27',
       port: 8083,
       username: '',
       sliderTimer: null,
@@ -243,7 +245,7 @@ export default {
       publishQos: 0,
       publishMessage: '0',
       subTopic: 'temp_hum/emqx',
-      publishTopic: 'temp_hum/emqx',
+      publishTopic: 'led/emqx',
       publishRetain: false,
       receivedMessages: [],
       publishedMessages: [],
@@ -260,7 +262,6 @@ export default {
       temperatureAlerts: [],
       humidityAlerts: [],
       inputNumberProps: {
-        label: '亮度:',
         size: 'large'
       },
       deviceLocation: []
@@ -293,7 +294,7 @@ export default {
       // 设置一个新的定时器，在一定时间后发送数据
       this.sliderTimer = setTimeout(() => {
         this.mqttPublish(this.publishMessage)
-      }, 150) // 这里的500毫秒是一个示例延迟时间，可以根据需要调整
+      }, 50) // 延迟，防止单片机不能及时接受导致卡死
     },
     checkTemperature () {
       // 获取温度和湿度值
@@ -516,15 +517,16 @@ export default {
     mqttPublish () {
       if (this.client.connected) {
         const numericValue = parseInt(this.publishMessage) // 将输入的内容解析为整数
-        const temperature = this.getLatestValueByTopic('temp_hum/emqx', 'temp')
-        const humidity = this.getLatestValueByTopic('temp_hum/emqx', 'hum')
-        const light = this.getLatestValueByTopic('temp_hum/emqx', 'light')
-        const power = this.getLatestValueByTopic('temp_hum/emqx', 'power')
-        const id = this.getLatestValueByTopic('temp_hum/emqx', 'id')
-        const lng = this.getLatestValueByTopic('temp_hum/emqx', 'lng')
-        const lat = this.getLatestValueByTopic('temp_hum/emqx', 'lat')
+        // const temperature = this.getLatestValueByTopic('temp_hum/emqx', 'temp')
+        // const humidity = this.getLatestValueByTopic('temp_hum/emqx', 'hum')
+        // const light = this.getLatestValueByTopic('temp_hum/emqx', 'light')
+        // const power = this.getLatestValueByTopic('temp_hum/emqx', 'power')
+        // const id = this.getLatestValueByTopic('temp_hum/emqx', 'id')
+        // const lng = this.getLatestValueByTopic('temp_hum/emqx', 'lng')
+        // const lat = this.getLatestValueByTopic('temp_hum/emqx', 'lat')
         if (!isNaN(numericValue)) { // 检查是否为有效数字
-          const messageObject = {'light': light, 'hum': humidity, 'temp': temperature, 'power': power, 'LED': numericValue, 'id': id, 'lng': lng, 'lat': lat} // 创建消息对象
+          const messageObject = {'led': numericValue} // 创建消息对象
+
           const messageString = JSON.stringify(messageObject) // 将消息对象转换为字符串
           const options = {
             qos: this.publishQos,

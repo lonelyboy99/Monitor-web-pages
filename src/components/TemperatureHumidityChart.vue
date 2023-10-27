@@ -61,8 +61,7 @@ export default {
               }
             },
             axisLabel: {
-              formatter: '{value}°C',
-              color: 'white'
+              formatter: '{value}°C'
             }
           },
           {
