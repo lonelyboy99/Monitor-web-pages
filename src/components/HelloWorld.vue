@@ -241,8 +241,8 @@ export default {
       keepalive: 60,
       clean: true,
       clientId: `mqttjs_${Math.random().toString(16).substr(2, 10)}`,
-      subQos: 0,
-      publishQos: 0,
+      subQos: 1,
+      publishQos: 1,
       publishMessage: '0',
       subTopic: 'temp_hum/emqx',
       publishTopic: 'led/emqx',
@@ -290,11 +290,15 @@ export default {
       if (this.sliderTimer !== null) {
         clearTimeout(this.sliderTimer) // 清除之前的定时器
       }
+      // 获取滑条的值
+      const newLedValue = this.publishMessage
 
-      // 设置一个新的定时器，在一定时间后发送数据
-      this.sliderTimer = setTimeout(() => {
-        this.mqttPublish(this.publishMessage)
-      }, 50) // 延迟，防止单片机不能及时接受导致卡死
+      // 只有在滑条的值发生变化时才发送MQTT消息
+      if (newLedValue !== this.getLatestValueByTopic('temp_hum/emqx', 'LED')) {
+        this.sliderTimer = setTimeout(() => {
+          this.mqttPublish(newLedValue)
+        }, 70)
+      }
     },
     checkTemperature () {
       // 获取温度和湿度值
@@ -353,7 +357,9 @@ export default {
           this.lngData.push({ time: currentTime, value: lng })
           this.latData.push({ time: currentTime, value: lat })
           this.calculateDeviceCount()
-          this.publishMessage = led
+          if (led !== 'N/A' && led !== this.publishMessage) {
+            this.publishMessage = led
+          }
         }
       }
     },
@@ -514,9 +520,9 @@ export default {
         })
       }
     },
-    mqttPublish () {
+    mqttPublish (ledValue) {
       if (this.client.connected) {
-        const numericValue = parseInt(this.publishMessage) // 将输入的内容解析为整数
+        const numericValue = parseInt(ledValue) // 将输入的内容解析为整数
         // const temperature = this.getLatestValueByTopic('temp_hum/emqx', 'temp')
         // const humidity = this.getLatestValueByTopic('temp_hum/emqx', 'hum')
         // const light = this.getLatestValueByTopic('temp_hum/emqx', 'light')
@@ -532,7 +538,6 @@ export default {
             qos: this.publishQos,
             retain: this.publishRetain
           }
-
           // to mark which trigger the reconnect
           this.sending = true
           this.client.publish(this.publishTopic, messageString, options, (error) => {
@@ -635,15 +640,13 @@ export default {
     // 监听lngData和latData属性的变化
     lngData (newLngData) {
       // 获取最新的经度值，假设是最后一个数据项的value
-      const lng = newLngData[newLngData.length - 1].value
       // 更新parentCenter的lng属性
-      this.parentCenter.lng = lng
+      this.parentCenter.lng = newLngData[newLngData.length - 1].value
     },
     latData (newLatData) {
       // 获取最新的纬度值，假设是最后一个数据项的value
-      const lat = newLatData[newLatData.length - 1].value
       // 更新parentCenter的lat属性
-      this.parentCenter.lat = lat
+      this.parentCenter.lat = newLatData[newLatData.length - 1].value
     }
   },
   created () {

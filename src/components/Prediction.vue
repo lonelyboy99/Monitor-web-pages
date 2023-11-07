@@ -14,6 +14,14 @@
         <label for="day" style="color:white;">日：</label>
         <input type="number" id="day" v-model="selectedDay" />
       </div>
+      <div>
+        <label for="hour" style="color:white;">小时：</label>
+        <input type="number" id="hour" v-model="selectedHour" />
+      </div>
+      <div>
+        <label for="minute" style="color:white;">分钟：</label>
+        <input type="number" id="minute" v-model="selectedMinute" />
+      </div>
     </div>
     <button @click="predictTemperature">预测温度</button>
     <p v-if="predictedTemperature !== null" style="color: white">
@@ -31,27 +39,20 @@ export default {
       selectedYear: null,
       selectedMonth: null,
       selectedDay: null,
+      selectedHour: null,
+      selectedMinute: null,
       predictedTemperature: null
-    }
-  },
-  computed: {
-    // 根据年、月、日计算一年中的某一天
-    dayOfYear () {
-      if (this.selectedYear && this.selectedMonth && this.selectedDay) {
-        const selectedDate = new Date(this.selectedYear, this.selectedMonth - 1, this.selectedDay)
-        const startOfYear = new Date(selectedDate.getFullYear(), 0, 1)
-        const day = Math.floor((selectedDate - startOfYear) / (24 * 60 * 60 * 1000)) + 1
-        return day
-      }
-      return null
     }
   },
   methods: {
     async predictTemperature () {
       try {
-        const response = await axios.post('http://122.51.210.27:5000/predict_temperature', {
-          day_of_year: this.dayOfYear,
-          year: this.selectedYear
+        const response = await axios.post('http://127.0.0.1:5000/predict_temperature', {
+          year: this.selectedYear,
+          month: this.selectedMonth,
+          day: this.selectedDay,
+          hour: this.selectedHour,
+          minute: this.selectedMinute
         })
         this.predictedTemperature = response.data.predicted_temperature
       } catch (error) {
